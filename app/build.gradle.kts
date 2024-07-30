@@ -51,12 +51,7 @@ android {
 }
 
 dependencies {
-    val libsuVersion = "6.0.0"
-
-    // The core module that provides APIs to a shell
     implementation (libs.core)
-
-    // Optional: APIs for creating root services. Depends on ":core"
     implementation (libs.service)
     implementation(libs.koin.androidx.compose)
     implementation(platform(libs.koin.bom))
