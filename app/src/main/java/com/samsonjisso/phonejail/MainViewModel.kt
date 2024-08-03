@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -15,18 +13,16 @@ import java.time.LocalTime
 @RequiresApi(Build.VERSION_CODES.O)
 class MainViewModel : ViewModel() {
 
-    private  suspend fun runAsRoot(command: String): String {
+    private  suspend fun runAsRoot(command: String): Pair<Int, String> {
         return withContext(Dispatchers.IO) {
             try {
                 val process = Runtime.getRuntime().exec(arrayOf("su", "-c", command))
-                val reader = BufferedReader(InputStreamReader(process.inputStream))
-                val output = StringBuilder()
-                reader.forEachLine { output.append(it).append("\n") }
-                reader.close()
-                process.waitFor()
-                output.toString()
+                val exitCode = process.waitFor()
+                val output = process.inputStream.bufferedReader().use { it.readText() }
+                Pair(exitCode, output)
             } catch (e: Exception) {
-                "Exception: ${e.message}"
+                e.printStackTrace()
+                Pair(-1, e.message ?: "Error executing root command")
             }
         }
     }
@@ -39,6 +35,8 @@ class MainViewModel : ViewModel() {
             "com.sec.android.app.samsungapps",
             "com.facebook.katana",
             "org.mozilla.firefox",
+            "org.telegram.messenger",
+            "com.chess",
             "com.zhiliaoapp.musically",
             "com.google.android.googlequicksearchbox"
         )
@@ -75,9 +73,9 @@ class MainViewModel : ViewModel() {
             else -> false
         }
     }
-    suspend fun checkAndRequestRootPermission(): Boolean {
-        return withContext(Dispatchers.IO) {
-            Shell.getShell().isRoot
-        }
-    }
+//    suspend fun checkAndRequestRootPermission(): Boolean {
+//        return withContext(Dispatchers.IO) {
+//            Shell.getShell().isRoot
+//        }
+//    }
 }

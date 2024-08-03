@@ -28,7 +28,6 @@ fun RootCommandView(
         output = viewModel.removeEnems()
 
     }
-    println("output $output")
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
